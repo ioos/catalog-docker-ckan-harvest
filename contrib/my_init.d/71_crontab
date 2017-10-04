@@ -1,5 +1,9 @@
 #!/bin/sh
 set -eux
 
-echo "*/2 * * * * root $CKAN_HOME/bin/paster --plugin=ckanext-harvest harvester -c $CKAN_CONFIG/ckan.ini run > /dev/null 2>&1" >> /etc/crontab
-
+# check if the cron entry already exists in the file so we don't add a line
+# each time the container restarts
+template_string="*/2 * * * * root $CKAN_HOME/bin/paster --plugin=ckanext-harvest harvester -c $CKAN_CONFIG/ckan.ini run > /dev/null 2>&1"
+if ! fgrep -q "$template_string" /etc/crontab; then
+    echo "$template_string" >> /etc/crontab
+fi
